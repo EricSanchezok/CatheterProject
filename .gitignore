@@ -1,0 +1,86 @@
+# Visual Studio Code directory
+.vscode/
+
+# Vscode history
+.history
+
+# Editor/IDE-specific files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.user
+*.suo
+*.cache
+*.log
+*.vscode
+.vscode/
+*.code-workspace
+
+# User-specific files
+*.suo
+*.user
+*.sln
+*.userprefs
+*.dbmdl
+*.dbproj.user
+*.suo
+*.suo
+*.nuget/
+node_modules/
+.idea/
+.vscode/
+.vscode-test/
+*.suo
+*.suo
+
+
+
+# Python bytecode files
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.db
+db.sqlite3
+
+# Compiled files
+*.pyc
+*.pyo
+
+# Dependencies
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.egg
+*.egg-info
+
+# OS or editor generated files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Config files with sensitive information (customize as needed)
+config.ini
+secrets.json
+settings.py
