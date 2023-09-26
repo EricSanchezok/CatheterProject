@@ -1,3 +1,7 @@
+# 防止数据集被上传
+Dataset/
+
+
 # Visual Studio Code directory
 .vscode/
 
