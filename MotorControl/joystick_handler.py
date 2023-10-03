@@ -23,22 +23,14 @@ axis_mapping = {
     5: 'RT'
 }
 
-def get_xbox_controller():
 
-    # 获取手柄对象
-    joystick_count = pygame.joystick.get_count()
-    if joystick_count > 0:
-        xbox_controller = pygame.joystick.Joystick(0)
-        xbox_controller.init()
-        print(f"Connected to {xbox_controller.get_name()}")
-        return xbox_controller
-    else:
-        raise Exception("No Xbox controller found!")
 
 
 class JOYSTICK:
     def __init__(self):
-
+        """
+        初始化 JOYSTICK 类，包括手柄状态、事件监听和 pygame 初始化。
+        """
         self.state = {
             'A': False,
             'B': False,
@@ -57,10 +49,36 @@ class JOYSTICK:
         self.last_state = copy.deepcopy(self.state)
 
         pygame.init()
-        self.xbox_controller = get_xbox_controller()
+
+        self.xbox_controller = self._get_xbox_controller()
+
+    def _get_xbox_controller(self):
+        """
+        获取连接的 Xbox 手柄控制器对象。
+
+        Returns:
+            pygame.joystick.Joystick: 连接的 Xbox 手柄控制器对象。
+        Raises:
+            Exception: 如果没有找到Xbox控制器。
+        """
+        joystick_count = pygame.joystick.get_count()
+
+        if joystick_count > 0:
+            xbox_controller = pygame.joystick.Joystick(0)
+            xbox_controller.init()
+
+            print(f"Connected to {xbox_controller.get_name()}")
+
+            return xbox_controller
+        else:
+            raise Exception("No Xbox controller found!")
 
     def listening_joystick(self):
+        """
+        监听手柄事件，更新手柄状态。
+        """
 
+        # 复制当前状态以备后用
         self.last_state = copy.deepcopy(self.state)
 
         for event in pygame.event.get():
@@ -94,7 +112,19 @@ class JOYSTICK:
 
 
     def check_button_transition(self, button_name):
+        """
+        检查按钮状态的转换，返回 True 如果按钮由按下变为释放。
+
+        Args:
+            button_name (str): 要检查的按钮名称。
+
+        Returns:
+            bool: 如果按钮状态由按下变为释放，则返回 True;否则返回 False。
+        """
         return self.last_state.get(button_name, False) == False and self.state.get(button_name, False) == True
     
     def out(self):
+        """
+        退出 pygame,释放资源。
+        """
         pygame.quit()

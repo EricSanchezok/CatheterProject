@@ -77,7 +77,7 @@ def balance_force(motor_test, motors):
         if SINGLE_MOTOR_TEST:
             motor_test.force_control(0.15)
         else:
-            motors.reset(reset_force=0.10)
+            motors.reset_motors(reset_force=0.10)
             pass
     except:
         pass
@@ -137,7 +137,7 @@ def loop(target_frequency):
             if SINGLE_MOTOR_TEST:
                 pass
             else:
-                motors.reset_origin()
+                motors.reset_turn_length()
             
         if online_control:
             speed_forward = joystick.state['RS'][1] * FORWARD_COEFF if joystick.state['RS'][1] > MIN_THRESHOLD or joystick.state['RS'][1] < -MIN_THRESHOLD else 0
