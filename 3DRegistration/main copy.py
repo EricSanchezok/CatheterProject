@@ -19,10 +19,17 @@ near, far = 10, 2000.0
 scale_factor = 20.0
 
 load_mesh = mesh.Mesh.from_file('Dataset\MedModels\\0014_H_AO_COA\\Models\\0102_0001.stl')
-# 获取顶点和法线信息
-vertices = load_mesh.vectors * scale_factor
-normals = load_mesh.normals
 
+# 提取顶点和法线数据
+vertices = load_mesh.vectors.reshape(-1, 3) * scale_factor
+normals = load_mesh.normals.repeat(3, axis=0).reshape(-1, 3)
+
+# 提取索引数据（构建索引列表）
+indices = np.arange(len(vertices))
+
+print(vertices.shape)
+print(normals.shape)
+print(len(vertices))
 
 def save_image(img_render):
 
@@ -59,7 +66,6 @@ def set_projection_matrix(fx, fy, cx, cy, w, h, near, far):
 
 
 def display(params):
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
@@ -71,13 +77,18 @@ def display(params):
     glRotatef(params[4], 0, 1, 0)  # 绕y轴旋转
     glRotatef(params[5], 0, 0, 1)  # 绕z轴旋转
 
-    # 渲染STL文件
-    glBegin(GL_TRIANGLES)
-    for i in range(len(normals)):
-        glNormal3fv(normals[i])  # 指定法线
-        for j in range(3):
-            glVertex3fv(vertices[i, j])  # 指定顶点
-    glEnd()
+    # 启用顶点数组和法线数组
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_NORMAL_ARRAY)
+
+    # 指定顶点和法线数组数据（使用顶点和法线列表）
+    glVertexPointer(3, GL_FLOAT, 0, vertices)
+    glNormalPointer(GL_FLOAT, 0, normals)
+
+    glDrawArrays(GL_TRIANGLES, 0, len(vertices))
+    
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_NORMAL_ARRAY)
 
 
 
@@ -118,7 +129,7 @@ def main():
 
 
     path = "Dataset\\RegistrationImgs\\OpenGL\\"
-    img_name = "7.png"
+    img_name = "30.png"
     # 读取该图片
     img_target = cv2.imread(path + img_name)
 
@@ -198,9 +209,9 @@ def main():
         y = func(x, img_render, contour_sample)
 
         # 求 y 的模长
-        e = 0.5 * np.linalg.norm(y) ** 2
+        e = 0.5 * y.T @ y
         print("iteration: %d, error: %f" % (iteration, e))
-        print("x: ", x)
+        # print("x: ", x)
 
         num_outputs = y.shape[0]
         num_inputs = x.shape[0]
