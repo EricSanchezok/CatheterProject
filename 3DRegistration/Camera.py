@@ -1,4 +1,6 @@
 import pyrealsense2 as rs
+import numpy as np
+import cv2
 
 class RealSenseL515:
     def __init__(self) -> None:
@@ -56,7 +58,12 @@ class RealSenseL515:
         if self.camera_intrinsics is None:
             self.camera_intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
 
-        return aligned_depth_frame, color_frame
+        depth_image = np.asanyarray(aligned_depth_frame.get_data())
+        depth_image = depth_image * self.depth_scale
+
+        color_image = np.asanyarray(color_frame.get_data())
+
+        return color_image, depth_image
 
 
     def get_camera_intrinsics(self):
@@ -67,3 +74,20 @@ class RealSenseL515:
             相机内参对象。
         """
         return self.camera_intrinsics
+    
+
+
+
+def main():
+    color_image, _ = Camera.get_aligned_frames() 
+
+    print(Camera.get_camera_intrinsics())
+
+    # key = cv2.waitKey(0)
+
+    # if key & 0xFF == ord('q') or key == 27:
+    #     cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    Camera = RealSenseL515()
+    main()
