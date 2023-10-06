@@ -4,10 +4,6 @@ import cv2
 import utils
 import opengl
 
-import random
-from deap import base, creator, tools, algorithms
-
-
 counterT = utils.get_contour_points(PATH_IMG, IMG_NAME, M)
 vertices, normals = opengl.load_mesh(PATH_MESH)
 

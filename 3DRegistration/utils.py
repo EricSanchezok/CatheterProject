@@ -24,6 +24,9 @@ def get_contour_points(path, img_name, m):
 
     # 采样
     contour_sample = []
+
+    m = m if len(contour) > m else len(contour)
+
     for i in range(m):
         index = int(i / m * len(contour))
         contour_sample.append(contour[index])
@@ -33,15 +36,18 @@ def get_contour_points(path, img_name, m):
     return contour_sample
 
 
-def save_image(img, path):
-    # 读取路径下的所有文件名
-    files = os.listdir(path)
-    if len(files) == 0:
-        cv2.imwrite(path + "1.png", img)
+def save_image(img, path, name=None):
+    if name is None:
+        # 读取路径下的所有文件名
+        files = os.listdir(path)
+        if len(files) == 0:
+            cv2.imwrite(path + "1.png", img)
+        else:
+            max_num = 0
+            for file in files:
+                num = int(file.split('.')[0])
+                if num > max_num:
+                    max_num = num
+            cv2.imwrite(path + str(max_num + 1) + ".png", img)
     else:
-        max_num = 0
-        for file in files:
-            num = int(file.split('.')[0])
-            if num > max_num:
-                max_num = num
-        cv2.imwrite(path + str(max_num + 1) + ".png", img)
+        cv2.imwrite(path + name, img)

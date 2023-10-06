@@ -8,12 +8,12 @@ CX = 650.548
 CY = 357.754
 
 PATH_IMG = "Dataset\\RegistrationImgs\\OpenGL\\"
-IMG_NAME = "39.png"
+IMG_NAME = "7.jpg"
 PATH_MESH = 'Dataset\MedModels\\0014_H_AO_COA\\Models\\0102_0001.stl'
 
 SACLE_FACTOR = 20.0
 NEAR, FAR = 10, 2000.0
-M = 50
+M = 100
 
 MAX_ITERATIONS = 1000
 
