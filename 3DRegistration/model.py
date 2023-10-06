@@ -28,7 +28,6 @@ class ConvNet(nn.Module):
             nn.BatchNorm1d(1024),
             nn.Mish(),
             nn.Linear(1024, 6),
-            nn.Tanh(),
         )
 
     def forward(self, x):

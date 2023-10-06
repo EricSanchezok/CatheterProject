@@ -1,6 +1,6 @@
 # 防止数据集被上传
 Dataset/
-
+3DRegistration/models
 
 # Visual Studio Code directory
 .vscode/

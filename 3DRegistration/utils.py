@@ -1,7 +1,25 @@
 import cv2
 import numpy as np
 import os
+from torchvision import transforms
+import torch
+from model import ConvNet
+from config import *
 
+from PIL import Image
+
+
+
+# 使用transforms来对图像进行预处理
+transform = transforms.Compose([
+    transforms.Resize((256, 256)),  # 调整图像大小
+    transforms.ToTensor(),  # 将图像转换为PyTorch张量
+])
+
+model_path = '3DRegistration/models/convnet.pth'
+model = ConvNet()
+model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+model.eval()
 
 
 def get_contour_points(path, img_name, m):
@@ -34,6 +52,20 @@ def get_contour_points(path, img_name, m):
     contour_sample = np.array(contour_sample, dtype=np.int32)
 
     return contour_sample
+
+def get_suggest_τ(path, img_name):
+    # 读取该图片
+    img_target = cv2.imread(path + img_name)
+
+    # 将 numpy.ndarray 转换为 PIL 图像
+    pil_img = Image.fromarray(img_target)
+
+    # 将图像转换为PyTorch张量
+    img_tensor = transform(pil_img)
+
+    output = model(img_tensor.unsqueeze(0)).squeeze(0).detach().numpy()
+
+    return output
 
 
 def save_image(img, path, name=None):

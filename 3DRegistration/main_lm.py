@@ -4,6 +4,7 @@ import cv2
 import utils
 import opengl
 
+
 counterT = utils.get_contour_points(PATH_IMG, IMG_NAME, M)
 vertices, normals = opengl.load_mesh(PATH_MESH)
 
@@ -40,7 +41,11 @@ if __name__ == "__main__":
 
     opengl.init()
 
+    # τ = utils.get_suggest_τ(PATH_IMG, IMG_NAME)
+
     τ = np.array([0.0, 0.0, -500, 0.0, 0.0, 0.0], dtype=float)
+
+    print("τ: ", τ)
 
     for iteration in range(MAX_ITERATIONS):
 

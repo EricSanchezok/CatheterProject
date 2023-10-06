@@ -1,3 +1,7 @@
+import torch    
+
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 W = 1280
 H = 720
 
@@ -7,9 +11,9 @@ FY = 899.905
 CX = 650.548
 CY = 357.754
 
-PATH_IMG = "Dataset\\RegistrationImgs\\OpenGL\\"
-IMG_NAME = "7.jpg"
-PATH_MESH = 'Dataset\MedModels\\0014_H_AO_COA\\Models\\0102_0001.stl'
+PATH_IMG = "Dataset/MedModels/0014_H_AO_COA/imgdata/"
+IMG_NAME = "image_122.jpg"
+PATH_MESH = 'Dataset/MedModels/0014_H_AO_COA/Models/0102_0001.stl'
 
 SACLE_FACTOR = 20.0
 NEAR, FAR = 10, 2000.0
