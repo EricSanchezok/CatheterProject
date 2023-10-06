@@ -108,6 +108,9 @@ def func(x, img_render, contour_sample):
 
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    # 绘制轮廓
+    cv2.drawContours(img_render, contours, -1, (0, 0, 255), 3)
+
     # 读取轮廓点
     contour = contours[0]
     contour = contour.reshape(-1, 2)
@@ -129,7 +132,7 @@ def main():
 
 
     path = "Dataset\\RegistrationImgs\\OpenGL\\"
-    img_name = "30.png"
+    img_name = "1.png"
     # 读取该图片
     img_target = cv2.imread(path + img_name)
 
@@ -226,7 +229,7 @@ def main():
 
         I = np.eye(jacobian.shape[1], dtype=float) 
 
-        u = 0.1 * np.linalg.norm(y) ** 2
+        u = 0.00001 * e
 
         delta_x = - np.linalg.inv((jacobian.T @ jacobian + u * I)) @ jacobian.T @ y
 
