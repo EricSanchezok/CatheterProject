@@ -7,6 +7,16 @@ FY = 899.905
 CX = 650.548
 CY = 357.754
 
+PATH_IMG = "Dataset\\RegistrationImgs\\OpenGL\\"
+IMG_NAME = "39.png"
+PATH_MESH = 'Dataset\MedModels\\0014_H_AO_COA\\Models\\0102_0001.stl'
+
+SACLE_FACTOR = 20.0
+NEAR, FAR = 10, 2000.0
+M = 50
+
+MAX_ITERATIONS = 1000
+
 K1 = 0.143195
 K2 = -0.472782
 P1 = 0.00055683
