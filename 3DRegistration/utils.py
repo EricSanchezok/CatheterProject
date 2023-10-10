@@ -53,6 +53,31 @@ def get_contour_points(path, img_name, m):
 
     return contour_sample
 
+
+def get_thresh_img(path, img_name):
+    # 读取该图片
+    img_target = cv2.imread(path + img_name)
+
+    # 提取轮廓
+    img_gray = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(img_gray, 127, 255, 0)
+
+    return thresh
+
+def get_hu_moments(path, img_name):
+    # 读取该图片
+    img_target = cv2.imread(path + img_name)
+
+    # 提取轮廓
+    img_gray = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
+
+    moments = cv2.moments(img_gray)
+    hu_moments = cv2.HuMoments(moments).flatten()
+
+    return hu_moments
+
+
+
 def get_suggest_τ(path, img_name):
     # 读取该图片
     img_target = cv2.imread(path + img_name)

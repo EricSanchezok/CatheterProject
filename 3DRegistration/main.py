@@ -6,7 +6,11 @@ import opengl
 
 
 counterT = utils.get_contour_points(PATH_IMG, IMG_NAME, M)
+threshT = utils.get_thresh_img(PATH_IMG, IMG_NAME)
+hu_momentsT = utils.get_hu_moments(PATH_IMG, IMG_NAME)
 vertices, normals = opengl.load_mesh(PATH_MESH)
+
+hu_moments_countT = cv2.HuMoments(counterT).flatten()
 
 
 def func(τ):
@@ -15,25 +19,11 @@ def func(τ):
 
     # 提取轮廓
     img_gray = cv2.cvtColor(img_render, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(img_gray, 127, 255, 0)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # 创建一个空的 NumPy 数组来存储所有点
-    contour = np.array([], dtype=np.int32).reshape(0, 2)
+    moments = cv2.moments(img_gray)
+    hu_moments = cv2.HuMoments(moments).flatten()
 
-    # 遍历所有轮廓，将轮廓的点连接起来
-    for c in contours:
-        contour = np.vstack((contour, c.reshape(-1, 2)))
-
-    distanceList = []
-    for i in range(len(counterT)):
-        distance = np.min(np.linalg.norm(counterT[i] - contour, axis=1))
-        distanceList.append(distance)
-
-    # 转换成numpy数组
-    y = np.array(distanceList, dtype=float)
-
-    return y
+    return hu_moments - hu_momentsT
 
 
 
@@ -41,11 +31,11 @@ if __name__ == "__main__":
 
     opengl.init()
 
-    # τ = utils.get_suggest_τ(PATH_IMG, IMG_NAME)
+    τ = utils.get_suggest_τ(PATH_IMG, IMG_NAME)
 
-    τ = np.array([0.0, 0.0, -700, 0.0, 0.0, 0.0], dtype=float)
+    # τ = np.array([0.0, 0.0, -500, 0.0, 0.0, 0.0], dtype=float)
 
-    print("τ: ", τ)
+    # print("τ: ", τ)
 
     for iteration in range(MAX_ITERATIONS):
 
@@ -59,7 +49,7 @@ if __name__ == "__main__":
             cv2.circle(img_show, (int(point[0]), int(point[1])), 1, (0, 0, 255), 2)
         cv2.imshow("img", img_show)
 
-        e = 0.5 * d.T @ d
+        e = np.linalg.norm(d)
 
         num_outputs = d.shape[0]
         num_inputs = τ.shape[0]
@@ -67,9 +57,9 @@ if __name__ == "__main__":
 
         for i in range(num_inputs):
             if i <= 3:
-                epsilon = 1.0
+                epsilon = 1
             else:
-                epsilon = 1.0
+                epsilon = 1
             delta_τ = np.zeros_like(τ)
             delta_τ[i] = epsilon
             jacobian[:, i] = (func(τ + delta_τ) - func(τ - delta_τ)) / (2 * epsilon)
@@ -77,7 +67,8 @@ if __name__ == "__main__":
 
         I = np.eye(jacobian.shape[1], dtype=float) 
 
-        u = 0.000001 * e
+        u = 0.0000001 * e
+
 
         delta_τ = - np.linalg.inv((jacobian.T @ jacobian + u * I)) @ jacobian.T @ d
 
@@ -85,7 +76,7 @@ if __name__ == "__main__":
 
         print("iteration: ", iteration, "error: ", e, "delta_τ: ", delta_τ)
 
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(0)
 
         if key == ord('q'):
             break

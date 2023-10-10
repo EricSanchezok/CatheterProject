@@ -12,7 +12,7 @@ CX = 650.548
 CY = 357.754
 
 PATH_IMG = "Dataset/MedModels/0014_H_AO_COA/imgdata/"
-IMG_NAME = "image_122.jpg"
+IMG_NAME = "image_38.jpg"
 PATH_MESH = 'Dataset/MedModels/0014_H_AO_COA/Models/0102_0001.stl'
 
 SACLE_FACTOR = 20.0
