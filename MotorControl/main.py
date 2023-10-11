@@ -7,6 +7,15 @@ from motor_group_control import MotorGroup
 from joystick_handler import JOYSTICK
 from config import *
 
+
+"""
+
+这部分代码仍然在持续的更新和改进中
+
+因此暂时没有注释
+
+"""
+
 def change_online_control(online_control, motor_test, motors):
     try:
         online_control = not online_control
