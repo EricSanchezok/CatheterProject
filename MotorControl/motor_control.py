@@ -33,7 +33,7 @@ class Motor:
 
         self.turn_length = 0.0
 
-    def _write_serial_data(self, send_buffer):
+    def _write_serial_data(self, send_buffer, check=True):
         """
         向串口写入数据，并处理接收缓冲区。
 
@@ -49,8 +49,9 @@ class Motor:
 
         self.ser.write(send_buffer)
         receive_buffer = self.ser.read(buffer_size).hex()
+        # print(receive_buffer)
 
-        if len(receive_buffer) != buffer_size * 2:
+        if len(receive_buffer) != buffer_size * 2 and check:
             raise Exception("id: " + self.ID + " receive buffer length error")
         else:
             pass
@@ -110,7 +111,6 @@ class Motor:
         send_buffer[10] = '00'
         
         receive_buffer = self._write_serial_data(send_buffer)
-
         self._decode_serial_data(receive_buffer)
 
     def speed_control(self, velocity):
@@ -199,6 +199,21 @@ class Motor:
             'position_KP': self._decode_field(split_values[9]),
             'position_KI': self._decode_field(split_values[10])
         }
+
+    def reset_multi_position(self):
+
+        send_buffer = ['3E', self.ID, '08', '64', '00', '00', '00', '00', '00', '00', '00']
+        receive_buffer = self._write_serial_data(send_buffer)
+
+        self.reset_system()
+
+    def reset_system(self):
+
+        send_buffer = ['3E', self.ID, '08', '76', '00', '00', '00', '00', '00', '00', '00']
+        receive_buffer = self._write_serial_data(send_buffer, check=False)
+
+
+
 
 
     def __repr__(self):

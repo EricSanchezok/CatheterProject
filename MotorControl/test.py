@@ -1,41 +1,72 @@
+import serial
+import sys
+import time
+from pyinstrument import Profiler
+from motor_control import Motor
+from motor_group_control import MotorGroup
+from joystick_handler import JOYSTICK
+from config import *
+
+
+speed = 0
+
+def loop():
+    # global speed
+
+    # if joystick.check_button_transition('X'):
+    #     speed = 50
+
+    # if joystick.check_button_transition('A'):
+    #     speed = -50
+
+    # if joystick.check_button_transition('B'):
+    #     speed = 0
+
+    # motor_0.delta_position_control(speed / FORWARD_RATIO, target_period)
+    # motor_1.delta_position_control(-speed, target_period)
+    # motor_2.delta_position_control(speed, target_period)
 
 
 
-# number = 10000
 
-# def decimal_to_hexadecimal(number):
+if __name__ == '__main__':
 
-#     hex_value = hex(abs(number)).replace('0x', '')
+    target_frequency = 10
 
-#     while len(hex_value) % 8 != 0:
-#         hex_value = '0' + hex_value
+    joystick = JOYSTICK()
+
+    ser = serial.Serial('COM3', 115200, timeout=0.05)
+
+    motor_0 = Motor(0, ser)
+    motor_1 = Motor(1, ser)
+    motor_2 = Motor(2, ser)
+    motor_3 = Motor(3, ser)
+    motor_4 = Motor(4, ser)
+    motor_5 = Motor(5, ser)
+    motor_6 = Motor(6, ser)
+
+    
+    profiler = Profiler()
+    profiler.start()
+
+    target_period = 1.0 / target_frequency
+
+    while 1:
+
+        start_time = time.time()
+        joystick.listening_joystick()
+
+        loop()
+
+        elapsed_time = time.time() - start_time
+        print(1/elapsed_time)
+        if elapsed_time < target_period:
+            time.sleep(target_period - elapsed_time)
 
 
-#     if number < 0:
-#         int_value = int(hex_value, 16)
-#         hex_value = hex(~int_value + 1 & 0xFFFFFFFF).replace('0x', '')
+    profiler.stop()
+    profiler.print()
 
-
-#     split_values = [hex_value[i:i+2] for i in range(0, len(hex_value), 2)]
-
-#     split_values = ['0x' + value.upper() for value in split_values]
-
-#     # split_values = [int('0x' + value, 16) for value in split_values]
-
-#     return split_values
-
-# print(decimal_to_hexadecimal(number))
-
-receive_buffer = "3e01089c326400f4012d000000"
-split_values = [receive_buffer[i:i+2].upper() for i in range(0, len(receive_buffer), 2)]
-
-tempreture = int(split_values[4], 16)                       # 温度单位为摄氏度
-current = int(split_values[6] + split_values[5], 16) * 0.01 # 电流单位为 A
-speed = int(split_values[8] + split_values[7], 16)          # 速度单位为 dps
-position = int(split_values[10] + split_values[9], 16)      # 位置单位为度
-
-print(split_values)
-
-print(tempreture, current, speed, position)
-
+    joystick.out()
+    sys.exit()
 
