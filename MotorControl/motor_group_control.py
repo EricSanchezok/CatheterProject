@@ -16,7 +16,7 @@ class PIController:
         self.prev_error = error
         return output
 
-controller = PIController(2.0, 0.01)
+controller = PIController(1.5, 0.1)
 
 class MotorGroup:
     def __init__(self, ser):
@@ -74,9 +74,16 @@ class MotorGroup:
         for motor in self.motorgroup.values():
             if motor.ID in ['03', '04', '05', '06']:
                 velocity = controller.update(0, motor.position, timestamp)
-                motor.delta_position_control(velocity, timestamp)
-                # print(velocity, ", ", motor.position)
-                if abs(motor.position) > 1.0:
+                # 限制velocity在 [-300, 300]
+                velocity = max(min(velocity, 300), -300)
+                min_vel = 30
+                if velocity > 0 and velocity < min_vel:
+                    velocity = min_vel
+                elif velocity < 0 and velocity > -min_vel:
+                    velocity = -min_vel
+                motor.speed_control(velocity)
+                print('returning zero position: ', motor.ID, motor.position, velocity)
+                if abs(motor.position) > 4.0:
                     finish *= False
 
         return finish
@@ -84,47 +91,37 @@ class MotorGroup:
 
 
     def move(self, speed_forward, timestamp):
-        self.motorgroup['straight'].delta_position_control(speed_forward, timestamp)
-        self.motorgroup['left_straight'].delta_position_control(-speed_forward*FORWARD_RATIO, timestamp)
-        self.motorgroup['right_straight'].delta_position_control(speed_forward*FORWARD_RATIO, timestamp)
+        self.motorgroup['straight'].speed_control(speed_forward)
+        self.motorgroup['left_straight'].speed_control(-speed_forward*FORWARD_RATIO)
+        self.motorgroup['right_straight'].speed_control(speed_forward*FORWARD_RATIO)
 
     def turn(self, speed_turn, timestamp):
         
-        # v1 = speed_turn[0] if speed_turn[0] > 0 else 0
-        # v3 = 0 if speed_turn[0] > 0 else -speed_turn[0]
+        v1 = speed_turn[0] if speed_turn[0] > 0 else 0
+        v3 = 0 if speed_turn[0] > 0 else -speed_turn[0]
 
-        # v2 = speed_turn[1] if speed_turn[1] > 0 else 0
-        # v4 = 0 if speed_turn[1] > 0 else -speed_turn[1]
+        v2 = speed_turn[1] if speed_turn[1] > 0 else 0
+        v4 = 0 if speed_turn[1] > 0 else -speed_turn[1]
 
+        if self.motorgroup['right'].position > 0 and v3 > 0:
+            v1 = -v3
+            v3 = 0
+        if self.motorgroup['left'].position < 0 and v1 > 0:
+            v3 = -v1
+            v1 = 0
+        if self.motorgroup['up'].position > 0 and v4 > 0:
+            v2 = -v4
+            v4 = 0
+        if self.motorgroup['down'].position < 0 and v2 > 0:
+            v4 = -v2
+            v2 = 0
 
-        # if self.motorgroup['right'].position > 0 and v3 > 0:
-        #     v1 = -v3
-        #     v3 = 0
-        # if self.motorgroup['left'].position > 0 and v1 > 0:
-        #     v3 = -v1
-        #     v1 = 0
-
-        # if self.motorgroup['up'].position > 0 and v4 > 0:
-        #     v2 = -v4
-        #     v4 = 0
-        # if self.motorgroup['down'].position > 0 and v2 > 0:
-        #     v4 = -v2
-        #     v4 = 0
-
-        # print(v1, ", ", v2, ", ", v3, ", ", v4)
-
-        v4 = 500
+        self.motorgroup['right'].speed_control(v1)
+        self.motorgroup['up'].speed_control(v2)
         
-        # self.motorgroup['right'].delta_position_control(v1, timestamp)
-        # self.motorgroup['up'].delta_position_control(v2, timestamp)
-        
-        # self.motorgroup['down'].delta_position_control(-v4, timestamp)
-        # self.motorgroup['left'].delta_position_control(-v3, timestamp)
-
-        # self.motorgroup['right'].speed_control(v1)
-        # self.motorgroup['up'].speed_control(v2)
         self.motorgroup['down'].speed_control(-v4)
-        # self.motorgroup['left'].speed_control(-v3)
+        self.motorgroup['left'].speed_control(-v3)
+
         
         
 

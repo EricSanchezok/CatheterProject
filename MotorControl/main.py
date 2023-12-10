@@ -91,7 +91,9 @@ def loop(target_frequency):
 
                 
         if joystick.check_button_transition('X'):
+            print("Reset all motors position")
             motors.reset_motors_position()
+            print("Reset all motors position finished")
 
         if joystick.check_button_transition('A'):
             return_position = True
@@ -110,22 +112,22 @@ def loop(target_frequency):
             
             speed_turn = [vx, vy]
 
-           #motors.move(speed_forward, target_period)
-            motors.turn(speed_turn, target_period)
+            print("speed_forward: ", round(speed_forward, 2), " speed_turn: ", round(speed_turn[0], 2), round(speed_turn[1], 2))
 
-            # try: 
-            #     motors.move(speed_forward, target_period)
-            #     motors.turn(speed_turn, target_period)
-            # except:
-            #     online_control = False
-            #     print("Motor control error, set online_control to False")
+
+
+            try: 
+                motors.move(speed_forward, target_period)
+                motors.turn(speed_turn, target_period)
+            except:
+                online_control = False
+                print("Motor control error, set online_control to False")
 
         else:
             try:
                 if not return_position:
                     motors.keep_force(0.0)
             except:
-                # raise Exception("no motor connected")
                 pass
 
         elapsed_time = time.time() - start_time
@@ -144,7 +146,7 @@ if __name__ == '__main__':
     joystick = JOYSTICK()
     ser = serial.Serial('COM4', baudrate=115200, timeout=0.1)
 
-    loop(100)
+    loop(25)
 
     ser.close()
     joystick.out()

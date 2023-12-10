@@ -1,4 +1,5 @@
 from data_formatting import calculate_crc, decimal_to_hexadecimal
+import time
 
 class Motor:
     def __init__(self, ID, ser):
@@ -31,7 +32,6 @@ class Motor:
             'position_KI': None
         }
 
-        self.turn_length = 0.0
 
     def _write_serial_data(self, send_buffer, check=True):
         """
@@ -47,14 +47,29 @@ class Motor:
         buffer_size = 13
         send_buffer = calculate_crc(send_buffer)
 
+        # print('send_buffer: ', send_buffer)
         self.ser.write(send_buffer)
         receive_buffer = self.ser.read(buffer_size).hex()
-        # print(receive_buffer)
+        # print('receive_buffer: ', receive_buffer)
 
-        if len(receive_buffer) != buffer_size * 2 and check:
-            raise Exception("id: " + self.ID + " receive buffer length error")
-        else:
-            pass
+        target_sequence = ['3e', self.ID, '08']
+        try:
+            start_index = receive_buffer.index(target_sequence[0]+target_sequence[1]+target_sequence[2])
+            if start_index != 0:
+                receive_buffer = receive_buffer[start_index:]
+                rereaed_size = buffer_size - len(receive_buffer)
+                receive_buffer.extend(self.ser.read(rereaed_size).hex())
+        except:
+            receive_buffer = None
+
+        # print('repeat receive_buffer: ', receive_buffer)
+
+
+
+        # if len(receive_buffer) != buffer_size * 2 and check:
+        #     raise Exception("id: " + self.ID + " receive buffer length error")
+        # else:
+        #     pass
 
         return receive_buffer
     
@@ -84,12 +99,14 @@ class Motor:
         Args:
             receive_buffer (str): 从串口接收的16进制数据字符串。
         """
-        split_values = [receive_buffer[i:i+2].upper() for i in range(0, len(receive_buffer), 2)]
 
-        self.tempreture = self._decode_field(split_values[4])                 # 温度单位为摄氏度
-        self.current = self._decode_field(split_values[6] + split_values[5]) * 0.01  # 电流单位为 A
-        self.speed = self._decode_field(split_values[8] + split_values[7])    # 速度单位为 dps
-        self.position = self._decode_field(split_values[10] + split_values[9]) # 位置单位为度
+        if receive_buffer != None:
+            split_values = [receive_buffer[i:i+2].upper() for i in range(0, len(receive_buffer), 2)]
+
+            self.tempreture = self._decode_field(split_values[4])                 # 温度单位为摄氏度
+            self.current = self._decode_field(split_values[6] + split_values[5]) * 0.01  # 电流单位为 A
+            self.speed = self._decode_field(split_values[8] + split_values[7])    # 速度单位为 dps
+            self.position = self._decode_field(split_values[10] + split_values[9]) # 位置单位为度
         
 
     def force_control(self, force):
@@ -224,4 +241,4 @@ class Motor:
             str: 电机状态的字符串表示。
         """
 
-        return f"Motor {self.ID}, Temperature: {self.tempreture}°C, Current: {self.current}A, Speed: {self.speed}dps, Position: {self.position}°, Turn length: {self.turn_length}°"
+        return f"Motor {self.ID}, Temperature: {self.tempreture}°C, Current: {self.current}A, Speed: {self.speed}dps, Position: {self.position}°"

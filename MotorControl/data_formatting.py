@@ -62,3 +62,17 @@ def calculate_crc(send_buffer):
     send_buffer = [int('0x' + value, 16) for value in send_buffer] + [crc[0], crc[1]]
 
     return send_buffer
+
+class PIController:
+    def __init__(self, kp, ki):
+        self.kp = kp
+        self.ki = ki
+        self.prev_error = 0
+        self.integral = 0
+
+    def update(self, set, current, dt):
+        error = set - current
+        self.integral += error * dt
+        output = self.kp * error + self.ki * self.integral
+        self.prev_error = error
+        return output
