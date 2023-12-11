@@ -35,10 +35,10 @@ class MotorGroup:
             ser: 串口通信对象。
         """
         self.motorgroup = {
-            'right': Motor(3, ser),
-            'left': Motor(6, ser),
-            'down': Motor(5, ser),
-            'up': Motor(4, ser),
+            'right': Motor(6, ser),
+            'left': Motor(3, ser),
+            'down': Motor(4, ser),
+            'up': Motor(5, ser),
             'left_straight': Motor(1, ser),
             'right_straight': Motor(2, ser),
             'straight': Motor(0, ser)

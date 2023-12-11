@@ -32,11 +32,11 @@ def change_online_control(online_control, motors):
         pass
 
 def stop_all_motors(motors):
+    print("Stop all motors")
     try:
-        print("Stop all motors")
         motors.stop()
     except:
-        pass
+        print("Stop all motors error")
 
 def show_pid_parameters(motors):
     try :
@@ -52,7 +52,7 @@ def show_motor_state(motors):
         for motor in motors.motorgroup.values():
             print(repr(motor))
     except:
-        pass
+        print("Show motor state error")
 
 
 
@@ -77,6 +77,7 @@ def loop(target_frequency):
 
         if joystick.check_button_transition('BACK'):
             running = False
+            print("Exit")
             stop_all_motors(motors)
 
         if joystick.check_button_transition('START'):
@@ -118,7 +119,8 @@ def loop(target_frequency):
 
             try: 
                 motors.move(speed_forward, target_period)
-                motors.turn(speed_turn, target_period)
+                if not return_position:
+                    motors.turn(speed_turn, target_period)
             except:
                 online_control = False
                 print("Motor control error, set online_control to False")
@@ -144,9 +146,9 @@ def loop(target_frequency):
 if __name__ == '__main__':
     
     joystick = JOYSTICK()
-    ser = serial.Serial('COM4', baudrate=115200, timeout=0.1)
+    ser = serial.Serial('COM7', baudrate=115200, timeout=0.05)
 
-    loop(25)
+    loop(20)
 
     ser.close()
     joystick.out()

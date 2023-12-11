@@ -33,7 +33,7 @@ class Motor:
         }
 
 
-    def _write_serial_data(self, send_buffer, check=True):
+    def _write_serial_data(self, send_buffer, wait=False):
         """
         向串口写入数据，并处理接收缓冲区。
 
@@ -49,6 +49,7 @@ class Motor:
 
         # print('send_buffer: ', send_buffer)
         self.ser.write(send_buffer)
+        if wait: time.sleep(0.2)
         receive_buffer = self.ser.read(buffer_size).hex()
         # print('receive_buffer: ', receive_buffer)
 
@@ -220,14 +221,17 @@ class Motor:
     def reset_multi_position(self):
 
         send_buffer = ['3E', self.ID, '08', '64', '00', '00', '00', '00', '00', '00', '00']
-        receive_buffer = self._write_serial_data(send_buffer)
+        receive_buffer = self._write_serial_data(send_buffer, wait=True)
+
+        if receive_buffer == None:
+            print("motor ", self.ID, " reset multi position error")
 
         self.reset_system()
 
     def reset_system(self):
 
         send_buffer = ['3E', self.ID, '08', '76', '00', '00', '00', '00', '00', '00', '00']
-        receive_buffer = self._write_serial_data(send_buffer, check=False)
+        receive_buffer = self._write_serial_data(send_buffer)
 
 
 

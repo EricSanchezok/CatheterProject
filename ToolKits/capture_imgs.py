@@ -2,7 +2,7 @@ import cv2
 import os
 
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     path = "Dataset\\RGBDIMGS\\20231208\\"
     id = 0
@@ -18,9 +18,13 @@ if __name__ == '__main__':
 
     id += 1
 
+    # 创建窗口
+    cv2.namedWindow('Fullscreen', cv2.WINDOW_NORMAL)
+
+
     while True:
         ret, frame = cap.read()
-        cv2.imshow("capture", frame)
+        cv2.imshow("Fullscreen", frame)
 
         key = cv2.waitKey(1)
 
