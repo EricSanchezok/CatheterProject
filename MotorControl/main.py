@@ -7,6 +7,8 @@ from motor_group_control import MotorGroup
 from joystick_handler import JOYSTICK
 from config import *
 
+from serial.tools import list_ports
+
 
 """
 
@@ -65,8 +67,6 @@ def loop(target_frequency):
 
     motors = MotorGroup(ser)
 
-
-
     online_control = False
     running = True
     return_position = False
@@ -115,8 +115,6 @@ def loop(target_frequency):
 
             print("speed_forward: ", round(speed_forward, 2), " speed_turn: ", round(speed_turn[0], 2), round(speed_turn[1], 2))
 
-
-
             try: 
                 motors.move(speed_forward, target_period)
                 if not return_position:
@@ -139,19 +137,38 @@ def loop(target_frequency):
         else:
             pass
 
+        
     profiler.stop()
     profiler.print()
 
+def find_available_com_port():
+    available_ports = list_ports.comports()
+
+    for port, desc, hwid in sorted(available_ports):
+        try:
+            ser = serial.Serial(port, baudrate=115200, timeout=0.05)
+            ser.close()
+            print(f"Found available COM port: {port}")
+            return port
+        except serial.SerialException as e:
+            print(f"Failed to open {port}: {e}")
+
+    print("No available COM port found.")
+    return None
+
+
 
 if __name__ == '__main__':
-    
-    joystick = JOYSTICK()
-    ser = serial.Serial('COM7', baudrate=115200, timeout=0.05)
 
-    loop(20)
+    com_port = find_available_com_port()
+    if com_port:
+        ser = serial.Serial(com_port, baudrate=115200, timeout=0.05)
+        joystick = JOYSTICK()
+        loop(20)
 
-    ser.close()
-    joystick.out()
+        ser.close()
+        joystick.out()
+
     sys.exit()
 
 

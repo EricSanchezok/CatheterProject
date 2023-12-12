@@ -2,9 +2,9 @@ import cv2
 import os
 
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
-    path = "Dataset\\RGBDIMGS\\20231208\\"
+    path = "Dataset\\RGBDIMGS\\20231212\\"
     id = 0
 
     #读取path路径下的所有文件名
