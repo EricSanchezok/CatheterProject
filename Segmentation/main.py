@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
         thresh = CatheterSeg.color_seg(frame, lower_catheter, upper_catheter, roi_range)
 
-        skeleton = CatheterSeg.skeletonize_image(thresh)
+        skeleton = CatheterSeg.skeletonize_image(thresh, 15)
 
         # 把result画在原图上
         frame[skeleton > 0] = (0, 0, 255)

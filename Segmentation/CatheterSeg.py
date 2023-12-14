@@ -18,8 +18,20 @@ def color_seg(img, lower, upper, roi_range=None):
 
     result = cv2.medianBlur(result, 7)
 
-    result = cv2.erode(result, np.ones((3, 3), np.uint8), iterations=2)
-    result = cv2.dilate(result, np.ones((3, 3), np.uint8), iterations=2)
+    result = cv2.erode(result, np.ones((3, 3), np.uint8), iterations=1)
+    result = cv2.dilate(result, np.ones((3, 3), np.uint8), iterations=4)
+
+
+    #寻找轮廓
+    contours, hierarchy = cv2.findContours(result, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+    result = np.zeros_like(result)
+
+    #只保留轮廓面积最大的轮廓的内部区域
+    if len(contours) > 0:
+        max_contour = max(contours, key=cv2.contourArea)
+        cv2.drawContours(result, [max_contour], 0, 255, -1)
+
 
     return result
 
@@ -39,7 +51,7 @@ def skeletonize_image(thresh, iterations=10):
     return skeleton
 
 if __name__ == '__main__':
-    path = "Dataset\\RGBDIMGS\\20231212\\img_3.png"
+    path = "Dataset\\RGBDIMGS\\20231213\\img_4.png"
     img = cv2.imread(path)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -50,9 +62,9 @@ if __name__ == '__main__':
     thresh = color_seg(img, lower_catheter, upper_catheter, roi_range)
 
     skeleton = skeletonize_image(thresh)
-
-    # img[skeleton > 0] = (0, 0, 255)
-    # cv2.rectangle(img, point1, point2, (0, 255, 0), 2)
+    # img[thresh>0]=(0,0,255)
+    img[skeleton > 0] = (0, 0, 255)
+    cv2.rectangle(img, point1, point2, (0, 255, 0), 2)
 
     cv2.imshow("img", img)
     cv2.imshow("thresh", thresh)

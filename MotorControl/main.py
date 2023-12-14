@@ -9,6 +9,12 @@ from config import *
 
 from serial.tools import list_ports
 
+import datetime
+import pandas as pd
+
+
+
+
 
 """
 
@@ -19,19 +25,6 @@ from serial.tools import list_ports
 """
 
 
-
-def change_online_control(online_control, motors):
-    try:
-        online_control = not online_control
-        if online_control: print("Online control enabled")
-        else:
-            motors.stop()
-            print("Online control disabled")
-
-        return online_control
-    
-    except:
-        pass
 
 def stop_all_motors(motors):
     print("Stop all motors")
@@ -70,6 +63,11 @@ def loop(target_frequency):
     online_control = False
     running = True
     return_position = False
+    record_path = "Dataset\\PreControlData\\"
+    reload_control = False
+    reload_path = "Dataset\\PreControlData\\file_2023-12-14_11-47-35.csv"
+    df = pd.read_csv(reload_path, header=None, names=['speed_forward', 'speed_turn_x', 'speed_turn_y'])
+    index = 0
     while running:
 
         start_time = time.time()
@@ -81,11 +79,21 @@ def loop(target_frequency):
             stop_all_motors(motors)
 
         if joystick.check_button_transition('START'):
-            online_control = change_online_control(online_control, motors)
+            if not online_control:
+                online_control = True
+                reload_control = False
+                current_time = datetime.datetime.now()
+                formatted_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+                file_name = record_path + f"file_{formatted_time}.csv"
+                print("Online control enabled")
+            else:
+                online_control = False
+                print("Online control disabled")
 
         if joystick.check_button_transition('Y'):
             stop_all_motors(motors)
             online_control = False
+            print("Online control disabled")
 
         if joystick.check_button_transition('B'):
             show_motor_state(motors)
@@ -99,11 +107,40 @@ def loop(target_frequency):
         if joystick.check_button_transition('A'):
             return_position = True
             print("starting return zero position")
+
+        if joystick.check_button_transition('LB'):
+            if not reload_control:
+                print("Start reload control")
+                reload_control = True
+                online_control = False
+                index = 0
+            else:
+                print("Stop reload control")
+                reload_control = False
         
         if return_position:
             return_position = not motors.return_zero_position(target_period)
             if not return_position:
                 print("return zero position finished")
+
+        if reload_control:
+            speed_forward = df.iloc[index]['speed_forward']
+            speed_turn = [df.iloc[index]['speed_turn_x'], df.iloc[index]['speed_turn_y']]
+
+            index += 1
+            print("index: ", index, "speed_forward: ", speed_forward, " speed_turn: ", speed_turn)
+
+            if index >= len(df):
+                reload_control = False
+                print("Reload control finished")
+            try: 
+                motors.move(speed_forward, target_period)
+                if not return_position:
+                    motors.turn(speed_turn, target_period)
+            except:
+                online_control = False
+                print("Motor control error, set reload_control to False")
+
 
         if online_control:
             speed_forward = joystick.state['RS'][1] * FORWARD_COEFF if joystick.state['RS'][1] > MIN_THRESHOLD or joystick.state['RS'][1] < -MIN_THRESHOLD else 0
@@ -113,7 +150,12 @@ def loop(target_frequency):
             
             speed_turn = [vx, vy]
 
-            print("speed_forward: ", round(speed_forward, 2), " speed_turn: ", round(speed_turn[0], 2), round(speed_turn[1], 2))
+            # print("speed_forward: ", round(speed_forward, 2), " speed_turn: ", round(speed_turn[0], 2), round(speed_turn[1], 2))
+
+
+            # 将speed_turn和speed_forward记录在dataframe中
+            with open(file_name, 'a') as f:
+                f.write(f"{speed_forward}, {speed_turn[0]}, {speed_turn[1]}\n")
 
             try: 
                 motors.move(speed_forward, target_period)
@@ -123,7 +165,7 @@ def loop(target_frequency):
                 online_control = False
                 print("Motor control error, set online_control to False")
 
-        else:
+        if not online_control and not reload_control:
             try:
                 if not return_position:
                     motors.keep_force(0.0)
@@ -133,6 +175,7 @@ def loop(target_frequency):
         elapsed_time = time.time() - start_time
         # print(1/elapsed_time)
         if elapsed_time < target_period:
+            # print(target_period - elapsed_time)
             time.sleep(target_period - elapsed_time)
         else:
             pass
