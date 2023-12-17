@@ -1,12 +1,15 @@
-import cv2
+import sys
 import os
+parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_path)
+
+
+import camera
+import cv2
 
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(2)
-
-    path = "Dataset\\RGBDIMGS\\20231213\\"
+    path = "Dataset\\RGBDIMGS\\20231217\\"
     id = 0
-
     #读取path路径下的所有文件名
     filelist = os.listdir(path)
     #文件名格式为img_1.png, img_2.png, ...
@@ -19,20 +22,22 @@ if __name__ == '__main__':
     id += 1
 
     # 创建窗口
-    cv2.namedWindow('Fullscreen', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('color_image', cv2.WINDOW_NORMAL)
 
+
+    realSense_L515 = camera.RealSenseL515()
 
     while True:
-        ret, frame = cap.read()
-        cv2.imshow("Fullscreen", frame)
+        color_image, depth_image = realSense_L515.get_aligned_frames()
+        cv2.imshow("color_image", color_image)
 
         key = cv2.waitKey(1)
 
         if key & 0xFF == ord('q'):
             break
         elif key & 0xFF == ord('s'):
-            cv2.imwrite(path + "img_" + str(id) + ".png", frame)
+            cv2.imwrite(path + "img_" + str(id) + ".png", color_image)
+            cv2.imwrite(path + "dep_" + str(id) + ".png", depth_image)
             id += 1
-
-    cap.release()
+            print("Save image " + str(id-1) + " successfully!")
     cv2.destroyAllWindows()

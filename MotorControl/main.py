@@ -65,7 +65,7 @@ def loop(target_frequency):
     return_position = False
     record_path = "Dataset\\PreControlData\\"
     reload_control = False
-    reload_path = "Dataset\\PreControlData\\file_2023-12-14_11-47-35.csv"
+    reload_path = "Dataset\\PreControlData\\file_2023-12-17_14-17-35.csv"
     df = pd.read_csv(reload_path, header=None, names=['speed_forward', 'speed_turn_x', 'speed_turn_y'])
     index = 0
     while running:
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     com_port = find_available_com_port()
     if com_port:
-        ser = serial.Serial(com_port, baudrate=115200, timeout=0.05)
+        ser = serial.Serial("COM11", baudrate=115200, timeout=0.05)
         joystick = JOYSTICK()
         loop(20)
 
