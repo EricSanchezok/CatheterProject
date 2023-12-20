@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     com_port = find_available_com_port()
     if com_port:
-        ser = serial.Serial("COM11", baudrate=115200, timeout=0.05)
+        ser = serial.Serial(com_port, baudrate=115200, timeout=0.05)
         joystick = JOYSTICK()
         loop(20)
 

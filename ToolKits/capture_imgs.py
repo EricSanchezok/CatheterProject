@@ -8,7 +8,7 @@ import camera
 import cv2
 
 if __name__ == '__main__':
-    path = "Dataset\\RGBDIMGS\\20231217\\"
+    path = "Dataset\\RGBDIMGS\\20231220\\"
     id = 0
     #读取path路径下的所有文件名
     filelist = os.listdir(path)

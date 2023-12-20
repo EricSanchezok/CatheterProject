@@ -10,12 +10,16 @@ from Segmentation import CatheterSeg
 from ToolKits import useful_colors as colors
 from ToolKits import camera
 
-
+def getpos(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        hsv = cv2.cvtColor(color_image, cv2.COLOR_BGR2HSV)
+        print("HSV:", hsv[y, x], "coordinate:", x, y)
 
 
 if __name__ == '__main__':
 
-    # cv2.namedWindow('color', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('color', cv2.WINDOW_NORMAL)
+    cv2.setMouseCallback('color', getpos)
     
     realSense_L515 = camera.RealSenseL515()
 
@@ -26,12 +30,14 @@ if __name__ == '__main__':
         
         curve_points = CatheterSeg.divide_thresh_into_points(thresh, 8)
         
-        # if curve_points is not None:
-        #     # 画出等分点
-        #     for i in range(curve_points.shape[0]):
-        #         cv2.circle(color_image, (int(curve_points[i, 0]), int(curve_points[i, 1])), 5, colors.get_blue2red_list(8)[i], -1)
+        if curve_points is not None:
+            # 画出等分点
+            for i in range(curve_points.shape[0]):
+                cv2.circle(color_image, (int(curve_points[i, 0]), int(curve_points[i, 1])), 5, colors.get_blue2red_list(8)[i], -1)
 
-        color_image[thresh == 255] = (0, 0, 255)
+        # color_image[thresh == 255] = (0, 0, 255)
+                
+        cv2.rectangle(color_image, CatheterSeg.point1, CatheterSeg.point2, (0, 255, 0), 2)
         cv2.imshow("color", color_image)
         # cv2.imshow("depth", depth_image)
 
