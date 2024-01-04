@@ -11,7 +11,7 @@ from serial.tools import list_ports
 
 import datetime
 import pandas as pd
-
+import os
 
 
 
@@ -63,11 +63,11 @@ def loop(target_frequency):
     online_control = False
     running = True
     return_position = False
-    record_path = "Dataset\\PreControlData\\"
+
     reload_control = False
-    reload_path = "Dataset\\PreControlData\\file_2023-12-17_14-17-35.csv"
     df = pd.read_csv(reload_path, header=None, names=['speed_forward', 'speed_turn_x', 'speed_turn_y'])
     index = 0
+
     while running:
 
         start_time = time.time()
@@ -204,7 +204,20 @@ def find_available_com_port():
 if __name__ == '__main__':
 
     com_port = find_available_com_port()
-    if com_port:
+    if True:
+        
+        reload_path = "Dataset\\PreControlData\\file_2023-12-17_14-17-35.csv"
+        record_path = "Dataset\\PreControlData\\"
+        # 检查目录是否存在
+        if not os.path.exists(record_path):
+            try:
+                # 创建目录
+                os.makedirs(record_path)
+                print(f"目录 '{record_path}' 创建成功！")
+            except OSError as e:
+                print(f"创建目录 '{record_path}' 失败：{e}")
+
+
         ser = serial.Serial(com_port, baudrate=115200, timeout=0.05)
         joystick = JOYSTICK()
         loop(20)
