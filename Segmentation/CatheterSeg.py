@@ -94,7 +94,7 @@ def divide_thresh_into_points(thresh, num_points):
 
     # 骨架化
     skeleton = skeletonize_image(img, iterations=20)
-    cv2.imshow("skeleton", skeleton)
+    # cv2.imshow("skeleton", skeleton)
 
     # 将图像中白色的点作为一个numpy数组
     points = np.nonzero(skeleton)

@@ -25,10 +25,12 @@ if __name__ == '__main__':
     cv2.namedWindow('color_image', cv2.WINDOW_NORMAL)
 
 
-    realSense_L515 = camera.RealSenseL515()
+    # realSense_L515 = camera.RealSenseL515()
+    cap = cv2.VideoCapture(1)
 
     while True:
-        color_image, depth_image = realSense_L515.get_aligned_frames()
+        # color_image, depth_image = realSense_L515.get_aligned_frames()
+        ret, color_image = cap.read()
         cv2.imshow("color_image", color_image)
 
         key = cv2.waitKey(1)
@@ -37,7 +39,7 @@ if __name__ == '__main__':
             break
         elif key & 0xFF == ord('s'):
             cv2.imwrite(path + "img_" + str(id) + ".png", color_image)
-            cv2.imwrite(path + "dep_" + str(id) + ".png", depth_image)
+            # cv2.imwrite(path + "dep_" + str(id) + ".png", depth_image)
             id += 1
             print("Save image " + str(id-1) + " successfully!")
     cv2.destroyAllWindows()
