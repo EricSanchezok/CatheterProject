@@ -70,15 +70,57 @@ def skeletonize_image(thresh, iterations=10):
 
 
 def fit_polynomial(points, degree):
-    x = points[:, 0]
-    y = points[:, 1]
-    coefficients = np.polyfit(x, y, degree)
-    polynomial = np.poly1d(coefficients)
+    try:
+        x = points[:, 0]
+        y = points[:, 1]
 
-    coefficients_inv = np.polyfit(y, x, degree)
-    polynomial_inv = np.poly1d(coefficients_inv)
+        coefficients = np.polyfit(x, y, degree)
+        polynomial = np.poly1d(coefficients)
 
-    return polynomial, polynomial_inv
+        coefficients_inv = np.polyfit(y, x, degree)
+        polynomial_inv = np.poly1d(coefficients_inv)
+
+        return polynomial, polynomial_inv
+    except np.linalg.LinAlgError as e:
+        print(f"Error in linear least squares: {e}")
+        return None, None
+
+def calculate_loss(result, points):
+    loss = 0
+    for i in range(result.shape[0]):
+        for j in range(points.shape[0]):
+            loss += np.linalg.norm(result[i] - points[j])
+    return loss / (result.shape[0] * points.shape[0])
+
+def optimize_points(points, num_points, degree=4):
+    points_0 = points[0]
+    points = points - points_0
+
+    polynomial, polynomial_inv = fit_polynomial(points, degree)
+
+    if polynomial is None or polynomial_inv is None:
+        return None
+
+    x_values = np.linspace(min(points[:, 0]), max(points[:, 0]), num_points)
+    y_values = polynomial(x_values)
+    result = np.column_stack((x_values, y_values))
+
+    loss = calculate_loss(result, points)
+
+    y_values = np.linspace(min(points[:, 1]), max(points[:, 1]), num_points)
+    x_values = polynomial_inv(y_values)
+    result_inv = np.column_stack((x_values, y_values))
+
+    loss_inv = calculate_loss(result_inv, points)
+
+    result = result + points_0
+    result_inv = result_inv + points_0
+
+    # print("loss:", loss, "loss_inv:", loss_inv)
+
+    if loss < loss_inv:
+        return result
+    return result_inv
 
 def divide_thresh_into_points(thresh, num_points):
     # 寻找轮廓
@@ -86,7 +128,7 @@ def divide_thresh_into_points(thresh, num_points):
 
     if len(contours) == 0:
         return None
-    
+
     contour = max(contours, key=cv2.contourArea)
 
     img = np.zeros_like(thresh)
@@ -94,50 +136,13 @@ def divide_thresh_into_points(thresh, num_points):
 
     # 骨架化
     skeleton = skeletonize_image(img, iterations=20)
-    # cv2.imshow("skeleton", skeleton)
 
     # 将图像中白色的点作为一个numpy数组
-    points = np.nonzero(skeleton)
-    points = np.column_stack((points[1], points[0]))
+    points = np.column_stack(np.nonzero(skeleton)[::-1])
 
-    points_0 = points[0]
-    points = points - points_0
+    result = optimize_points(points, num_points)
 
-    polynomial, polynomial_inv = fit_polynomial(points, degree=4)
-
-    x_values = np.linspace(min(points[:, 0]), max(points[:, 0]), num_points)
-    y_values = polynomial(x_values)
-
-    result = np.column_stack((x_values, y_values))
-
-    loss = 0
-    for i in range(result.shape[0]):
-        for j in range(points.shape[0]):
-            loss += np.linalg.norm(result[i] - points[j])
-
-    loss /= result.shape[0] * points.shape[0]
-
-    y_values = np.linspace(min(points[:, 1]), max(points[:, 1]), num_points)
-    x_values = polynomial_inv(y_values)
-
-    result_inv = np.column_stack((x_values, y_values))
-
-    loss_inv = 0
-    for i in range(result_inv.shape[0]):
-        for j in range(points.shape[0]):
-            loss_inv += np.linalg.norm(result_inv[i] - points[j])
-
-    loss_inv /= result_inv.shape[0] * points.shape[0]
-
-    result = result + points_0
-    result_inv = result_inv + points_0
-
-
-    # print("loss:", loss, "loss_inv:", loss_inv)
-
-    if loss < loss_inv:
-        return result
-    return result_inv 
+    return result
 
 if __name__ == '__main__':
     path = "Dataset\\RGBDIMGS\\20231220\\img_9.png"
@@ -156,7 +161,7 @@ if __name__ == '__main__':
     if curve_points is not None:    
         # 画出等分点
         for i in range(curve_points.shape[0]):
-            cv2.circle(img, (int(curve_points[i, 0]), int(curve_points[i, 1])), 5, colors.get_blue2red_list(point_num)[i], -1)
+            cv2.circle(img, (int(curve_points[i, 0]), int(curve_points[i, 1])), 5, (0, 0, 255), -1)
             
     # img[thresh > 0] = (0, 0, 255)
     cv2.rectangle(img, point1, point2, (0, 255, 0), 2)

@@ -1,8 +1,10 @@
 import serial
 import sys
+
+
 import time
 from pyinstrument import Profiler
-from motor_control import Motor
+from motor_control import Motor 
 from motor_group_control import MotorGroup
 from joystick_handler import JOYSTICK
 from config import *
@@ -14,7 +16,7 @@ import pandas as pd
 import os
 
 
-
+ 
 
 """
 
@@ -34,7 +36,7 @@ def stop_all_motors(motors):
         print("Stop all motors error")
 
 def show_pid_parameters(motors):
-    try :
+    try  :
         print("-------------------------------------")
         for motor in motors.motorgroup.values():
             print("ID: ", motor.ID, " PID parameters: ", motor.pid_parameters)
@@ -45,7 +47,7 @@ def show_motor_state(motors):
     try:
         print("-------------------------------------")
         for motor in motors.motorgroup.values():
-            print(repr(motor))
+             print(repr(motor))
     except:
         print("Show motor state error")
 
@@ -152,7 +154,6 @@ def loop(target_frequency):
 
             # print("speed_forward: ", round(speed_forward, 2), " speed_turn: ", round(speed_turn[0], 2), round(speed_turn[1], 2))
 
-
             # 将speed_turn和speed_forward记录在dataframe中
             with open(file_name, 'a') as f:
                 f.write(f"{speed_forward}, {speed_turn[0]}, {speed_turn[1]}\n")
@@ -206,7 +207,7 @@ if __name__ == '__main__':
     com_port = find_available_com_port()
     if True:
         
-        reload_path = "Dataset\\PreControlData\\file_2023-12-17_14-17-35.csv"
+        reload_path = "Dataset\\PreControlData\\file_2024-01-06_18-36-51.csv"
         record_path = "Dataset\\PreControlData\\"
         # 检查目录是否存在
         if not os.path.exists(record_path):

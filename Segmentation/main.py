@@ -4,7 +4,7 @@ import CatheterSeg
 from config import *
 
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture(1)
 
     # 创建窗口
     cv2.namedWindow('Fullscreen', cv2.WINDOW_NORMAL)

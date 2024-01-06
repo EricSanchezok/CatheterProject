@@ -28,12 +28,12 @@ if __name__ == '__main__':
 
         thresh = CatheterSeg.color_seg(color_image, CatheterSeg.lower_catheter, CatheterSeg.upper_catheter, CatheterSeg.roi_range)
         
-        curve_points = CatheterSeg.divide_thresh_into_points(thresh, 8)
+        curve_points = CatheterSeg.divide_thresh_into_points(thresh, 10)
         
         if curve_points is not None:
             # 画出等分点
             for i in range(curve_points.shape[0]):
-                cv2.circle(color_image, (int(curve_points[i, 0]), int(curve_points[i, 1])), 5, colors.get_blue2red_list(8)[i], -1)
+                cv2.circle(color_image, (int(curve_points[i, 0]), int(curve_points[i, 1])), 3, (colors.get_blue2red_list(10)[i]), -1)
 
         # color_image[thresh == 255] = (0, 0, 255)
                 
