@@ -207,7 +207,7 @@ if __name__ == '__main__':
     com_port = find_available_com_port()
     if True:
         
-        reload_path = "Dataset\\PreControlData\\file_2024-01-06_18-36-51.csv"
+        reload_path = "Dataset\\PreControlData\\file_2024-01-07_15-26-49.csv"
         record_path = "Dataset\\PreControlData\\"
         # 检查目录是否存在
         if not os.path.exists(record_path):
