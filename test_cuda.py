@@ -1,6 +1,6 @@
 import torch
 
-print("abaaba")
+print("sss")
 flag = torch.cuda.is_available()
 if flag:
     print("CUDA可使用")
