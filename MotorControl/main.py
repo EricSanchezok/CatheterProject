@@ -6,7 +6,7 @@ import time
 from pyinstrument import Profiler
 from motor_control import Motor 
 from motor_group_control import MotorGroup
-from joystick_handler import JOYSTICK
+from ToolKits.joystick_handler import JOYSTICK
 from config import *
 
 from serial.tools import list_ports

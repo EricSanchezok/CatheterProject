@@ -1,0 +1,13 @@
+
+# 控制频率
+TARGET_FREQUENCY = 15
+TARGET_PERIOD = 1.0 / TARGET_FREQUENCY
+
+# 通讯相关
+BAUDRATE = 115200
+TIMEOUT = 0.05
+
+
+
+
+RECORD_PATH = "Dataset\\PreControlData\\"
